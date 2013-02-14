@@ -214,55 +214,6 @@ function userphoto_exists($user){
 }
 
 
-//
-//function userphoto_get_userphoto_the_author_photo($user_id = false){
-//	#global $authordata;
-//	#global $comment;
-//	#if(!$user_id){
-//	#	if(!empty($comment) && $comment->user_id)
-//	#
-//	#		$user_id = $comment->user_id;
-//	#	else if(!empty($authordata))
-//	#		$user_id = $authordata->ID;
-//	#	//else trigger_error("Unable to discern user ID.");
-//	#}
-//	if($user_id && ($userdata = get_userdata($user_id)) && $userdata->userphoto_image_file){
-//		$img = '<img src="' . get_option('siteurl') . '/wp-content/uploads/userphoto/' . $userdata->userphoto_image_file . '"';
-//		$img .= ' alt="' . htmlspecialchars($userdata->display_name) . '"';
-//		$img .= ' width="' . htmlspecialchars($userdata->userphoto_image_width) . '"';
-//		$img .= ' height="' . htmlspecialchars($userdata->userphoto_image_height) . '"';
-//		$img .= ' />';
-//		return $img;
-//	}
-//	#Print default image
-//	else {
-//		return "";
-//	}
-//}
-//function userphoto_get_userphoto_the_author_thumbnail($user_id){
-//	#global $authordata;
-//	#global $comment;
-//	#if(!$user_id){
-//	#	if(!empty($comment) && $comment->user_id)
-//	#
-//	#		$user_id = $comment->user_id;
-//	#	else if(!empty($authordata))
-//	#		$user_id = $authordata->ID;
-//	#	//else trigger_error("Unable to discern user ID.");
-//	#}
-//	if($user_id && ($userdata = get_userdata($user_id)) && $userdata->userphoto_thumb_file){
-//		$img = '<img src="' . get_option('siteurl') . '/wp-content/uploads/userphoto/' . $userdata->userphoto_thumb_file . '"';
-//		$img .= ' alt="' . htmlspecialchars($userdata->display_name) . '"';
-//		$img .= ' width="' . htmlspecialchars($userdata->userphoto_thumb_width) . '"';
-//		$img .= ' height="' . htmlspecialchars($userdata->userphoto_thumb_height) . '"';
-//		$img .= ' />';
-//		return $img;
-//	}
-//	#Print default image
-//	else {
-//		return "";
-//	}
-//}
 
 function userphoto_comment_author_photo($before = '', $after = '', $attributes = array(), $default_src = ''){
 	global $comment;
@@ -526,18 +477,22 @@ function userphoto_delete_user($userID){
 }
 add_action('delete_user', 'userphoto_delete_user');
 
-
 function userphoto_admin_useredit_head(){
-	if(preg_match("/(user-edit\.php|profile.php)$/", $_SERVER['PHP_SELF']))
-		print '<link rel="stylesheet" href="../wp-content/plugins/user-photo/admin.css" />';
+	wp_register_style( 'user-photo-style', plugins_url('admin.css', __FILE__) );
 }
 function userphoto_admin_options_head(){
-	print '<link rel="stylesheet" href="../wp-content/plugins/user-photo/admin.css" />';
+	wp_register_style( 'user-photo-style', plugins_url('admin.css', __FILE__) );
+}
+
+function userphoto_add_styles_and_scripts(){
+    wp_enqueue_style( 'user-photo-style' );
+    wp_enqueue_style( 'jcrop' );
+    wp_enqueue_script( 'user-photo-script' , plugins_url('js/user-photo.js', __FILE__), array('jcrop'));
 }
 
 add_action('admin_head-options_page_user-photo/user-photo', 'userphoto_admin_options_head');
-add_action('admin_head', 'userphoto_admin_useredit_head');
-#add_action('admin_head-userphoto', 'userphoto_admin_head');
+add_action('admin_init', 'userphoto_admin_useredit_head');
+add_action('admin_enqueue_scripts', 'userphoto_add_styles_and_scripts');
 
 function userphoto_display_selector_fieldset(){
     #NOTE: an email needs to be sent to the admin when a contributor uploads a photo
@@ -609,11 +564,11 @@ function userphoto_display_selector_fieldset(){
             restore_current_blog();
 			$bdir = trailingslashit($upload_dir['baseurl']) . 'userphoto/';
 			?>
-            <p class='image'><img src="<?php echo $bdir . $profileuser->userphoto_image_file . "?" . rand() ?>" alt="Full size image" /><br />
-			Full size
+            <p class='image'><img class='user-photo-image full-size' src="<?php echo $bdir . $profileuser->userphoto_image_file . "?" . rand() ?>" alt="Full size image" /><br />
+			Current User Photo (Full size)
 			</p>
-			<p class='image'><img src="<?php echo $bdir . $profileuser->userphoto_thumb_file . "?" . rand() ?>" alt="Thumbnail image" /><br />
-			Thumb
+			<p class='image'><img class='user-photo-image thumbnail' src="<?php echo $bdir . $profileuser->userphoto_thumb_file . "?" . rand() ?>" alt="Thumbnail image" /><br />
+			Current User Photo (Thumbnail)
 			</p>
 			<hr />
             
@@ -643,6 +598,9 @@ function userphoto_display_selector_fieldset(){
 		printf(__("max upload size %s"),ini_get("upload_max_filesize"));
 		?>)</span></label>
 		</p>
+		<p class='image'><img class='user-photo-image preview' id="user-photo-preview" src="<?php echo $bdir . $profileuser->userphoto_image_file . "?" . rand() ?>" alt="Preview" /><br />
+        			User Photo Preview
+        			</p>
         <?php if($current_user->has_cap('edit_users') && ($profileuser->ID != $current_user->ID) && $profileuser->userphoto_image_file): ?>
 			<p id="userphoto-approvalstatus-controls" <?php if($profileuser->userphoto_approvalstatus == USERPHOTO_PENDING) echo "class='pending'" ?>>
 			<label><?php _e("Approval status:", 'user-photo') ?>
