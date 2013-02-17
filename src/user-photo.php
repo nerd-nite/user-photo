@@ -321,6 +321,8 @@ function cleanCropInfo($cropInfo) {
     if($cropInfo['y'] == -1) {
         $cropInfo['y'] = 0;
     }
+    $cropInfo['tgtW'] = $userphoto_maximum_dimension;
+    $cropInfo['tgtH'] = $userphoto_maximum_dimension;
 
     return $cropInfo;
 }
@@ -395,10 +397,8 @@ function userphoto_profile_update($userID) {
                 $imageinfo = getimagesize($tmppath);
                 if (!$imageinfo || !$imageinfo[0] || !$imageinfo[1])
                     $error = __("Unable to get image dimensions.", 'user-photo');
-                else if ($imageinfo[0] > $userphoto_maximum_dimension || $imageinfo[1] > $userphoto_maximum_dimension) {
-                    if (userphoto_resize_image($tmppath, null, $crop_info, $error)) {
-                        $imageinfo = getimagesize($tmppath);
-                    }
+                else if (userphoto_resize_image($tmppath, null, $crop_info, $error)) {
+                    $imageinfo = getimagesize($tmppath);
                 }
             }
 
@@ -427,11 +427,14 @@ function userphoto_profile_update($userID) {
 
                         #Generate thumbnail
                         $userphoto_thumb_dimension = get_option('userphoto_thumb_dimension');
+                        $full_dimension = get_option('userphoto_maximum_dimension');
                         $userphoto_thumb_size = array(
                             x => 0,
                             y => 0,
-                            w => $userphoto_thumb_dimension,
-                            h => $userphoto_thumb_dimension
+                            w => $full_dimension,
+                            h => $full_dimension,
+                            tgtW => $userphoto_thumb_dimension,
+                            tgtH => $userphoto_thumb_dimension
                         );
                         if (!($userphoto_thumb_dimension >= $imageinfo[0] && $userphoto_thumb_dimension >= $imageinfo[1])) {
                             userphoto_resize_image($imagepath, $thumbpath, $userphoto_thumb_size, $error);
@@ -909,11 +912,12 @@ function userphoto_resize_image($filename, $newFilename, $cropDetails, &$error) 
             imageantialias($image, TRUE);
         }
 
+        $full_dimension = get_option('userphoto_maximum_dimension');
 
-        $imageresized = imagecreatetruecolor($cropDetails['w'], $cropDetails['h']);
+        $imageresized = imagecreatetruecolor($cropDetails['tgtW'], $cropDetails['tgtH']);
         @ imagecopyresampled($imageresized, $image,
                              0, 0, $cropDetails['x'], $cropDetails['y'],
-                             $cropDetails['w'], $cropDetails['h'], $cropDetails['w'], $cropDetails['h']);
+                             $cropDetails['tgtW'], $cropDetails['tgtH'], $cropDetails['w'], $cropDetails['h']);
 
         // move the thumbnail to its final destination
         if ($info[2] == IMAGETYPE_GIF) {

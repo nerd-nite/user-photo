@@ -33,8 +33,8 @@
      * @param newSize
      */
     var updateSizeDisplay = function(newSize) {
-        var height = newSize.height || newSize.h,
-            width  = newSize.width || newSize.w;
+        var height = Math.round(newSize.height || newSize.h),
+            width  = Math.round(newSize.width || newSize.w);
 
         $('#userphoto-size-display .height').text(height);
         $('#userphoto-size-display .width').text(width);
@@ -47,10 +47,10 @@
      * @param coords
      */
     var updateCropSelection = function(coords) {
-        $("input[name=cropX]").val(coords.x);
-        $("input[name=cropY]").val(coords.y);
-        $("input[name=cropW]").val(coords.w);
-        $("input[name=cropH]").val(coords.h);
+        $("input[name=cropX]").val(Math.round(coords.x));
+        $("input[name=cropY]").val(Math.round(coords.y));
+        $("input[name=cropW]").val(Math.round(coords.w));
+        $("input[name=cropH]").val(Math.round(coords.h));
     };
 
         var fileReader = new FileReader();
@@ -75,6 +75,8 @@
                 {
                     aspectRatio: 1,
                     trueSize: [sizingImage.width, sizingImage.height],
+                    boxWidth: 350,
+                    boxHeight: 350,
                     setSelect: [0, 0, 250, 250],
                     onSelect: updateCropSelection,
                     onChange: updateSizeDisplay
