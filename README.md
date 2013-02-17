@@ -1,7 +1,8 @@
-user-photo
-==========
+user-photo v1.0.0
+=================
 
-This is a fork of the [user-photo Wordpress plugin](http://wordpress.org/extend/plugins/user-photo/) by [westonruter](http://profiles.wordpress.org/westonruter/)
+This is a fork of the [user-photo Wordpress plugin](http://wordpress.org/extend/plugins/user-photo/) by
+[westonruter](http://profiles.wordpress.org/westonruter/)
 and [ryanhellyer](http://profiles.wordpress.org/ryanhellyer/). Without them, this wouldn't exist.
 
 I have forked it for my own purposes. You're welcome to use it and you're welcome to submit pull requests and issues.
