@@ -76,14 +76,21 @@ $userphoto_prevent_override_avatar = false;
 # Place it in the "localization" folder and name it "user-photo-[value in wp-config].mo"
 load_plugin_textdomain('user-photo', false, dirname(plugin_basename(__FILE__)) . '/localization/'); #(thanks Pakus)
 
-function userphoto__init()
-{
-    if (get_option('userphoto_override_avatar') && !is_admin())
+function userphoto__init() {
+    if (get_option('userphoto_override_avatar')) {
         add_filter('get_avatar', 'userphoto_filter_get_avatar', 10, 4);
+    }
 }
 
 add_action('init', 'userphoto__init');
 
+/**
+ * @param $ravatar
+ * @param $id_or_email
+ * @param $size
+ * @param $default
+ * @return string
+ */
 function userphoto_filter_get_avatar($avatar, $id_or_email, $size, $default)
 {
     global $userphoto_using_avatar_fallback, $wpdb, $userphoto_prevent_override_avatar;
