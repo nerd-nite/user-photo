@@ -1,5 +1,3 @@
-
-
 #userphoto-status-pending {
 	background-color:yellow;
 	padding:3px;
@@ -7,6 +5,18 @@
 #userphoto-upload-error,
 #userphoto-status-rejected {
 	color:red;
+}
+
+#userphoto-size-display.ok-size {
+    color: #006400;
+}
+
+#userphoto-size-display.ok-size .warning{
+    display: none;
+}
+
+#userphoto-size-display.bad-size {
+    color: red;
 }
 
 #userphoto .field-hint {

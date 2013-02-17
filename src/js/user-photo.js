@@ -28,7 +28,32 @@
         };
     };
 
-    var fileReader = new FileReader();
+    /**
+     * Show the size of the currently selected crop region
+     * @param newSize
+     */
+    var updateSizeDisplay = function(newSize) {
+        var height = newSize.height || newSize.h,
+            width  = newSize.width || newSize.w;
+
+        $('#userphoto-size-display .height').text(height);
+        $('#userphoto-size-display .width').text(width);
+        $('#userphoto-size-display').toggleClass('ok-size',  width >= 150);
+        $('#userphoto-size-display').toggleClass('bad-size', width < 150);
+    };
+
+    /**
+     *
+     * @param coords
+     */
+    var updateCropSelection = function(coords) {
+        $("input[name=cropX]").val(coords.x);
+        $("input[name=cropY]").val(coords.y);
+        $("input[name=cropW]").val(coords.w);
+        $("input[name=cropH]").val(coords.h);
+    };
+
+        var fileReader = new FileReader();
     fileReader.onload = function(frEvent) {
         if(cropper) {
             cropper.destroy();
@@ -50,16 +75,18 @@
                 {
                     aspectRatio: 1,
                     trueSize: [sizingImage.width, sizingImage.height],
-                    onSelect: function() {
-                        console.log(arguments);
-                    }
+                    setSelect: [0, 0, 250, 250],
+                    onSelect: updateCropSelection,
+                    onChange: updateSizeDisplay
                 }, function() {
                     cropper = this;
                 }
             );
+            $('#userphoto-upload-cropper').show();
         });
         previewImage.attr('src', frEvent.target.result);
         sizingImage.src =  frEvent.target.result;
+        updateCropSelection({x:-1, y:-1, h:-1, w:-1});
 
     };
 
@@ -68,10 +95,13 @@
         if (fileInput.files.length === 0) { return; }
         var oFile = fileInput.files[0];
         fileReader.readAsDataURL(oFile);
+
+        $('#userphoto-upload-cropper').hide();
     };
 
     $(function() {
         console.log("User Photo running...");
+        $('#userphoto-upload-cropper').hide();
         $('#user-photo-preview')
             .width('300px')
             .height('300px')
